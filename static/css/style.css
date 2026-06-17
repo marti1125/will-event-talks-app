@@ -495,6 +495,41 @@ body {
     font-weight: 500;
 }
 
+.meta-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-card-copy {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.45rem 0.85rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: var(--transition-fast);
+}
+
+.btn-card-copy:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+    border-color: var(--border-hover);
+    transform: translateY(-1px);
+}
+
+.btn-card-copy.copied {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--accent-emerald);
+    border-color: rgba(16, 185, 129, 0.3);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.1);
+}
+
 .btn-card-tweet {
     background: rgba(29, 155, 240, 0.1);
     color: #1d9bf0;

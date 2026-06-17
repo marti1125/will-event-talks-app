@@ -52,9 +52,14 @@ function initProgressRing() {
 
 // Event Listeners Setup
 function setupEventListeners() {
-    // Refresh buttons
+    // Refresh & Export buttons
     btnRefresh.addEventListener('click', () => fetchReleaseNotes(true));
     btnRetry.addEventListener('click', () => fetchReleaseNotes(true));
+    
+    const btnExport = document.getElementById('btn-export');
+    if (btnExport) {
+        btnExport.addEventListener('click', exportToCSV);
+    }
     
     // Search
     searchInput.addEventListener('input', (e) => {
@@ -327,17 +332,53 @@ function createCardElement(update, index) {
                 <span class="type-badge">${update.type}</span>
                 <span class="card-date">${update.date}</span>
             </div>
-            <button class="btn-card-tweet" aria-label="Tweet about this update">
-                <svg viewBox="0 0 24 24" width="14" height="14">
-                    <path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                </svg>
-                <span>Tweet</span>
-            </button>
+            <div class="meta-actions">
+                <button class="btn-card-copy" aria-label="Copy update text to clipboard">
+                    <svg viewBox="0 0 24 24" width="14" height="14">
+                        <path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" />
+                    </svg>
+                    <span>Copy</span>
+                </button>
+                <button class="btn-card-tweet" aria-label="Tweet about this update">
+                    <svg viewBox="0 0 24 24" width="14" height="14">
+                        <path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                    </svg>
+                    <span>Tweet</span>
+                </button>
+            </div>
         </div>
         <div class="card-content">
             ${update.htmlContent}
         </div>
     `;
+    
+    // Copy Button Event Listener
+    const btnCopy = card.querySelector('.btn-card-copy');
+    btnCopy.addEventListener('click', (e) => {
+        e.stopPropagation();
+        navigator.clipboard.writeText(update.textContent)
+            .then(() => {
+                btnCopy.classList.add('copied');
+                btnCopy.innerHTML = `
+                    <svg viewBox="0 0 24 24" width="14" height="14">
+                        <path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" />
+                    </svg>
+                    <span>Copied!</span>
+                `;
+                setTimeout(() => {
+                    btnCopy.classList.remove('copied');
+                    btnCopy.innerHTML = `
+                        <svg viewBox="0 0 24 24" width="14" height="14">
+                            <path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" />
+                        </svg>
+                        <span>Copy</span>
+                    `;
+                }, 1500);
+            })
+            .catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+    });
     
     // Share Button Event Listener
     const btnTweet = card.querySelector('.btn-card-tweet');
@@ -497,4 +538,67 @@ function updateSyncIndicator(timestamp, source) {
     const isCached = source === 'cache' || source === 'cache_fallback';
     
     statusText.textContent = `Synced at ${timeStr} ${isCached ? '(Cached)' : ''}`;
+}
+
+// Export filtered release notes to CSV
+function exportToCSV() {
+    if (allUpdates.length === 0) return;
+    
+    // Get currently filtered list
+    const filtered = allUpdates.filter(up => {
+        if (currentFilterType !== 'all') {
+            if (up.type !== currentFilterType) return false;
+        }
+        if (searchQuery) {
+            const inContent = up.textContent.toLowerCase().includes(searchQuery);
+            const inType = up.type.toLowerCase().includes(searchQuery);
+            const inDate = up.date.toLowerCase().includes(searchQuery);
+            if (!inContent && !inType && !inDate) return false;
+        }
+        return true;
+    });
+    
+    if (filtered.length === 0) {
+        alert("No release notes found to export.");
+        return;
+    }
+    
+    // Construct CSV content
+    const headers = ["Date", "Type", "Link", "Description"];
+    const rows = [headers];
+    
+    filtered.forEach(up => {
+        rows.push([
+            up.date,
+            up.type,
+            up.link || 'https://cloud.google.com/bigquery/docs/release-notes',
+            up.textContent
+        ]);
+    });
+    
+    const csvContent = rows.map(row => 
+        row.map(value => {
+            const strVal = String(value || '');
+            const escaped = strVal.replace(/"/g, '""');
+            if (escaped.includes('"') || escaped.includes(',') || escaped.includes('\n') || escaped.includes('\r')) {
+                return `"${escaped}"`;
+            }
+            return escaped;
+        }).join(',')
+    ).join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    
+    const timestamp = new Date().toISOString().slice(0, 10);
+    const filterName = currentFilterType.toLowerCase();
+    const filename = `bigquery_release_notes_${filterName}_${timestamp}.csv`;
+    
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
