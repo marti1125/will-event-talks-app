@@ -980,3 +980,208 @@ body {
         padding: 1.25rem;
     }
 }
+
+/* Theme Toggle Switch CSS */
+.theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-color);
+    padding: 0.45rem 0.75rem;
+    border-radius: 10px;
+    height: 38px;
+}
+
+body.light-theme .theme-switch-wrapper {
+    background: rgba(0, 0, 0, 0.03);
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+.theme-switch {
+    display: inline-block;
+    height: 20px;
+    position: relative;
+    width: 36px;
+}
+
+.theme-switch input {
+    display: none;
+}
+
+.slider {
+    background-color: var(--text-muted);
+    bottom: 0;
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: var(--transition-normal);
+}
+
+.slider:before {
+    background-color: #ffffff;
+    bottom: 2px;
+    content: "";
+    height: 16px;
+    left: 2px;
+    position: absolute;
+    transition: var(--transition-normal);
+    width: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+input:checked + .slider {
+    background-color: var(--accent-blue);
+}
+
+input:checked + .slider:before {
+    transform: translateX(16px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+.theme-icon {
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+}
+
+body.light-theme .theme-icon.icon-sun {
+    color: var(--accent-amber);
+}
+
+body:not(.light-theme) .theme-icon.icon-moon {
+    color: var(--accent-purple);
+}
+
+/* Light Mode Variables Override */
+body.light-theme {
+    --bg-primary: #f1f5f9;       /* Slate 100 */
+    --bg-secondary: #ffffff;     /* White */
+    --bg-card: rgba(255, 255, 255, 0.7);
+    --border-color: rgba(0, 0, 0, 0.08);
+    --border-hover: rgba(0, 0, 0, 0.18);
+    
+    --text-primary: #0f172a;     /* Slate 900 */
+    --text-secondary: #475569;   /* Slate 600 */
+    --text-muted: #94a3b8;       /* Slate 400 */
+    
+    /* Modify colors for readability on light backgrounds */
+    --gradient-card-hover: linear-gradient(135deg, rgba(59, 130, 246, 0.06) 0%, rgba(139, 92, 246, 0.03) 100%);
+    
+    /* Overwrite modal and subcomponents to fit light theme */
+    #tweet-modal .modal-card {
+        background: #ffffff;
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    #tweet-modal .modal-header h2 {
+        background: linear-gradient(135deg, #0f172a 60%, #475569 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .original-preview {
+        background: rgba(0, 0, 0, 0.02);
+    }
+    
+    #tweet-textarea {
+        background: rgba(255, 255, 255, 0.9);
+        color: #0f172a;
+        border: 1px solid rgba(0, 0, 0, 0.12);
+    }
+    
+    #tweet-textarea:focus {
+        background: #ffffff;
+    }
+    
+    .tag-pill {
+        background: rgba(0, 0, 0, 0.04);
+        color: #475569;
+    }
+    
+    .tag-pill:hover {
+        background: rgba(29, 155, 240, 0.08);
+        color: #1d9bf0;
+    }
+    
+    #search-input {
+        background: rgba(255, 255, 255, 0.8);
+        color: #0f172a;
+        border-color: rgba(0, 0, 0, 0.1);
+    }
+    
+    #search-input:focus {
+        background: #ffffff;
+    }
+    
+    .filter-chip {
+        background: rgba(0, 0, 0, 0.04);
+        color: #475569;
+    }
+    
+    .filter-chip:hover {
+        background: rgba(0, 0, 0, 0.08);
+        color: #0f172a;
+    }
+    
+    .filter-chip.active {
+        color: #ffffff;
+    }
+    
+    .stats-counter {
+        background: rgba(0, 0, 0, 0.02);
+    }
+    
+    .card-content code {
+        background: rgba(0, 0, 0, 0.05);
+        color: #0f172a;
+        border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+    
+    .card-content pre {
+        background: #f8fafc;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+    
+    .card-content pre code {
+        color: #0f172a;
+    }
+    
+    /* Background decorative blobs - dial opacity down for light mode */
+    .blob {
+        opacity: 0.08;
+    }
+    
+    .btn-secondary {
+        background: rgba(0, 0, 0, 0.03);
+        color: #0f172a;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+    
+    .btn-secondary:hover {
+        background: rgba(0, 0, 0, 0.07);
+        border-color: rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn-card-copy {
+        background: rgba(0, 0, 0, 0.03);
+        color: #475569;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+    
+    .btn-card-copy:hover {
+        background: rgba(0, 0, 0, 0.06);
+        color: #0f172a;
+    }
+}
+

@@ -39,10 +39,24 @@ const hashtagPills = document.querySelectorAll('.tag-pill');
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
     initProgressRing();
     fetchReleaseNotes(false);
     setupEventListeners();
 });
+
+// Initialize Theme
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    const themeCheckbox = document.getElementById('checkbox-theme');
+    
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-theme');
+        if (themeCheckbox) {
+            themeCheckbox.checked = true;
+        }
+    }
+}
 
 // Initialize SVG Progress Circle
 function initProgressRing() {
@@ -59,6 +73,20 @@ function setupEventListeners() {
     const btnExport = document.getElementById('btn-export');
     if (btnExport) {
         btnExport.addEventListener('click', exportToCSV);
+    }
+    
+    // Theme Switch
+    const themeCheckbox = document.getElementById('checkbox-theme');
+    if (themeCheckbox) {
+        themeCheckbox.addEventListener('change', () => {
+            if (themeCheckbox.checked) {
+                document.body.classList.add('light-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.body.classList.remove('light-theme');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
     }
     
     // Search
